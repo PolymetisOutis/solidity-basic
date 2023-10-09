@@ -9,14 +9,28 @@ contract Address {
 
 
     /// @dev msg.senderはクエリ/トランザクション元アカウントアドレスが入っているグローバル変数
+    address public fromAddr;
 
+    constructor() {
+        fromAddr = msg.sender;
+    }
 
     /// @dev アカウントアドレス(EOA)の所有ETHを取得
-
+    function getBalance() public view returns (uint256) {
+        uint256 balance = fromAddr.balance;
+        return balance;
+    }
     /// @dev コントラクトのバイトコードを取得
-
+    function getByteCode() public view returns(bytes memory) {
+        return address(this).code;
+    }
     /// @dev コントラクトのバイトコードハッシュを取得
-
+    function getByteCodeHash() public view returns(bytes32) {
+        return address(this).codehash;
+    }
+    function getByteCodeHash2() public view returns(bytes32) {
+        return keccak256(address(this).code);
+    }
     /** 
      * @dev ETH送金 transfer/send/callの違い
      * transfer:宛先がコントラクトのアドレスである場合、
@@ -35,11 +49,23 @@ contract Address {
      */    
 
     /// @dev 宛先アドレスにtransferでETHを移転(移転の場合send/callよりもtransferを使おう)
-
+    function transfer(address payable to) public payable {
+        to.transfer(msg.value);
+    }
 
     /// @dev 宛先アドレスにsendでETHを移転
+    function send(address payable to) public payable returns (bool) {
+        bool result = to.send(msg.value);
+        require(result, "Failed");
+        return result;
+    }
 
 
     /// @dev 宛先アドレスにcallでETHを移転
+    function call(address payable to) public payable returns (bool, bytes memory) {
+        (bool result, bytes memory data) = to.call{value: msg.value}("");
+        require(result, "Failed");
+        return (result, data);
+    }
 
 }

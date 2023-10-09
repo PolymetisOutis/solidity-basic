@@ -11,31 +11,48 @@ pragma solidity ^0.8.17;
  */
 contract Contract {
     /// @dev constructorやfunctionにpayableを付与、宣言すると、コントラクトはETHを受け取れるようになる
-
+    constructor() payable {}
 
     /// @dev Addressコントラクトの型情報(type)から名前を取得
+    function getAddressName() public pure returns (string memory) {
+        return type(Address).name;
+    }
 
     /** 
      * @dev Addressコントラクトの型情報(type)から作成コードを取得
      * creationCodeはスマートコントラクトのコンストラクタロジックとコンストラクタパラメータを含む
      */
-
+    function getAddressCreationCode() public pure returns (bytes memory) {
+        return type(Address).creationCode;
+    }
 
     /** 
      * @dev Addressコントラクトの型情報(type)からランタイムコードを取得
      * runtimeCodeはオンチェーンに保存されるコード
      * このコードには、コントラクトのコンストラクタ・ロジックやコンストラクタ・パラメータは含まれない
      */
-
+    function getAddressRuntimeCode() public pure returns (bytes memory) {
+        return type(Address).runtimeCode;
+    }
     /// @dev thisは現コントラクト(Contract)を意味する
-
+    function getContractAddress() public view returns (address) {
+        return address(this);
+    }
     /// @dev 現コントラクトを破棄し、その資金を与えられたアドレスに送る。本当に削除されるのはトランザクション終了時。
-
+    function destruct() public {
+        // selfdestruct(payable(msg.sender));
+    }
     /// @dev コントラクト型（MyContract c）のローカル変数を定義し、Addressコントラクトのファンクションを実行
-    
+    function callAddressFunction(address _addr) public view returns (uint256) {
+        Address addrContract = Address(_addr);
+        return addrContract.getBalance();
+    }
     /// @dev コントラクトのインスタンス化
     // 別途改めて扱う
- 
+    function callIAddressFunction() public returns (uint256) {
+        Address addrContract = new Address('Tom');
+        return addrContract.getBalance();
+    }
 }
 
 /** 
